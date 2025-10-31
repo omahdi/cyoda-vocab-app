@@ -277,3 +277,11 @@ exclude = [
 [tool.bandit]
 exclude_dirs = ["tests", "proto", "build", "dist", "venv", "env"]
 skips = ["B101"]  # Skip assert_used test
+
+[tool.uv.sources]
+mcp-cyoda = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "mcp-cyoda",
+]
