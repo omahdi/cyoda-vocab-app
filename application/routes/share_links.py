@@ -6,6 +6,7 @@ from quart.typing import ResponseReturnValue
 from quart_schema import operation_id, tag, validate
 
 from application.entity.share_link.version_1 import ShareLink
+from common.entity.entity_casting import cast_entity
 from services.services import get_entity_service
 
 logger = logging.getLogger(__name__)
@@ -97,7 +98,7 @@ async def revoke_share_link(entity_id: str) -> ResponseReturnValue:
         )
         if not response:
             return {"error": "ShareLink not found"}, 404
-        share_link = response.data
+        share_link = cast_entity(response.data, ShareLink)
         share_link.revoke()
         updated_response = await service.update(
             entity_id=entity_id,
