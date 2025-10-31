@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Dict
 
-from quart import Blueprint, jsonify, request
+from quart import Blueprint
 from quart.typing import ResponseReturnValue
 from quart_schema import operation_id, tag, validate
 
@@ -112,4 +112,3 @@ async def revoke_share_link(entity_id: str) -> ResponseReturnValue:
     except Exception as e:
         logger.exception("Error revoking ShareLink: %s", str(e))
         return {"error": str(e)}, 500
-

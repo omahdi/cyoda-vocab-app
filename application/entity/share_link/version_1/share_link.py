@@ -36,7 +36,9 @@ class ShareLink(CyodaEntity):
         description="Timestamp of last access",
     )
     visit_count: int = Field(
-        default=0, alias="visitCount", description="Number of times the link was accessed"
+        default=0,
+        alias="visitCount",
+        description="Number of times the link was accessed",
     )
 
     @field_validator("token")
@@ -53,9 +55,7 @@ class ShareLink(CyodaEntity):
         self.visit_count += 1
 
     def revoke(self) -> None:
-        self.revoked_at = (
-            datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-        )
+        self.revoked_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -63,4 +63,3 @@ class ShareLink(CyodaEntity):
         validate_assignment=True,
         extra="allow",
     )
-
