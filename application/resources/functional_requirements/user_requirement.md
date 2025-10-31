@@ -1,0 +1,1 @@
+Write me an app that helps me manage vocabulary lists for learning a new foreign language. The app should allow me to upload words and phrases from CSV with the following attributes: id, lesson, front, back, comment. It should allow reviewing and filtering by lesson, support editing, exporting to CSV, and offer shareable public links for read-only views.
