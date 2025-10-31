@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "name": "VocabularyItem Workflow",
+  "desc": "Workflow for managing vocabulary items",
+  "initialState": "initial_state",
+  "active": true,
+  "states": {
+    "initial_state": {
+      "transitions": [
+        {
+          "name": "create",
+          "next": "created",
+          "manual": false
+        }
+      ]
+    },
+    "created": {
+      "transitions": [
+        {
+          "name": "complete",
+          "next": "completed",
+          "manual": false
+        }
+      ]
+    },
+    "completed": {
+      "transitions": []
+    }
+  }
+}
+

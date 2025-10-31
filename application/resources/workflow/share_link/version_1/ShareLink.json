@@ -1,0 +1,40 @@
+{
+  "version": "1.0",
+  "name": "ShareLink Workflow",
+  "desc": "Workflow for managing shareable links",
+  "initialState": "initial_state",
+  "active": true,
+  "states": {
+    "initial_state": {
+      "transitions": [
+        {
+          "name": "create",
+          "next": "created",
+          "manual": false
+        }
+      ]
+    },
+    "created": {
+      "transitions": [
+        {
+          "name": "activate",
+          "next": "active",
+          "manual": false
+        }
+      ]
+    },
+    "active": {
+      "transitions": [
+        {
+          "name": "revoke",
+          "next": "revoked",
+          "manual": true
+        }
+      ]
+    },
+    "revoked": {
+      "transitions": []
+    }
+  }
+}
+
