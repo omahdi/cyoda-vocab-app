@@ -33,7 +33,7 @@ async def create_share_link(data: ShareLink) -> ResponseReturnValue:
             entity_version=str(ShareLink.ENTITY_VERSION),
         )
         logger.info("Created ShareLink with ID: %s", response.metadata.id)
-        return _to_entity_dict(response.data), 201
+        return {**_to_entity_dict(response.data), "id": response.metadata.id}, 201
     except ValueError as e:
         logger.warning("Validation error: %s", str(e))
         return {"error": str(e)}, 400
@@ -58,7 +58,7 @@ async def get_share_link(entity_id: str) -> ResponseReturnValue:
         )
         if not response:
             return {"error": "ShareLink not found"}, 404
-        return _to_entity_dict(response.data), 200
+        return {**_to_entity_dict(response.data), "id": entity_id}, 200
     except Exception as e:
         logger.exception("Error getting ShareLink: %s", str(e))
         return {"error": str(e)}, 500
@@ -75,7 +75,7 @@ async def list_share_links() -> ResponseReturnValue:
             entity_class=ShareLink.ENTITY_NAME,
             entity_version=str(ShareLink.ENTITY_VERSION),
         )
-        entity_list = [_to_entity_dict(r.data) for r in entities]
+        entity_list = [{**_to_entity_dict(r.data), "id": r.metadata.id} for r in entities]
         return {"entities": entity_list, "total": len(entity_list)}, 200
     except Exception as e:
         logger.exception("Error listing ShareLinks: %s", str(e))

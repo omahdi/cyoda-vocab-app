@@ -7,6 +7,7 @@ from quart_schema import QuartSchema, ResponseSchemaValidationError, hide
 
 from application.routes.share_links import share_links_bp
 from application.routes.shared_vocabulary import shared_vocabulary_bp
+from application.ui.ui import ui_bp
 
 # Import blueprints for different route groups
 from application.routes.vocabulary_items import vocabulary_items_bp
@@ -51,6 +52,7 @@ QuartSchema(
 app.register_blueprint(vocabulary_items_bp)
 app.register_blueprint(share_links_bp)
 app.register_blueprint(shared_vocabulary_bp)
+app.register_blueprint(ui_bp)
 
 # Global holder for the background task to satisfy mypy
 # (avoid setting arbitrary attrs on app)
@@ -131,7 +133,7 @@ async def add_cors_headers() -> None:
     @app.after_request
     async def apply_cors(response: Response) -> Response:
         response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = "*"
         response.headers["Access-Control-Allow-Credentials"] = "true"
         return response
