@@ -12,7 +12,11 @@ logger = logging.getLogger(__name__)
 
 
 def _to_entity_dict(data: Any) -> Dict[str, Any]:
-    return data.model_dump(by_alias=True) if hasattr(data, "model_dump") else data
+    result = data.model_dump(by_alias=True) if hasattr(data, "model_dump") else data
+    # Handle nested structure: {'type': 'ENTITY', 'data': {...}, 'meta': {...}}
+    if isinstance(result, dict) and 'data' in result and 'type' in result:
+        return result['data']
+    return result
 
 
 vocabulary_items_bp = Blueprint(

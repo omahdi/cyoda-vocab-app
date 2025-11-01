@@ -10,7 +10,7 @@ from application.ui.components import (
     vocabulary_row,
     vocabulary_table_shell,
 )
-from fasthtml.common import A, Article, H1, P
+from fasthtml.common import A, Article, H1, P, to_xml
 
 ui_bp = Blueprint("ui", __name__)
 
@@ -36,7 +36,7 @@ async def admin_page():
         vocabulary_table_shell(),
         share_form(),
     )
-    return str(page)
+    return to_xml(page), 200, {"Content-Type": "text/html"}
 
 
 @ui_bp.route("/ui/items", methods=["GET"])
@@ -46,7 +46,7 @@ async def get_items():
         data = await call_api("GET", "/vocabulary-items")
         items = data.get("entities", [])
         rows = [vocabulary_row(item) for item in items]
-        return "".join(str(row) for row in rows)
+        return "".join(to_xml(row) for row in rows)
     except Exception as e:
         return f"<tr><td colspan='5'>Error loading items: {str(e)}</td></tr>"
 
@@ -66,7 +66,7 @@ async def create_item():
         }
 
         result = await call_api("POST", "/vocabulary-items", json_data=item_data)
-        return str(vocabulary_row(result))
+        return to_xml(vocabulary_row(result))
 
     except Exception as e:
         return f"<tr><td colspan='5'>Error creating item: {str(e)}</td></tr>"
@@ -99,7 +99,7 @@ async def create_share():
         token = result.get("token")
         full_url = f"http://localhost:8000/s/{token}"
 
-        return str(share_result(token, full_url, result.get("label", "")))
+        return to_xml(share_result(token, full_url, result.get("label", "")))
 
     except Exception as e:
         return f"<div>Error creating share link: {str(e)}</div>"
@@ -111,12 +111,12 @@ async def public_viewer(token: str):
     try:
         data = await call_api("GET", f"/shared/{token}")
         page = public_viewer_page(token, data)
-        return str(page)
+        return to_xml(page), 200, {"Content-Type": "text/html"}
 
     except httpx.HTTPStatusError as e:
         if e.response.status_code == 404:
             return (
-                str(
+                to_xml(
                     base_layout(
                         "Share Not Found",
                         Article(
@@ -127,11 +127,12 @@ async def public_viewer(token: str):
                     )
                 ),
                 404,
+                {"Content-Type": "text/html"},
             )
         raise
     except Exception as e:
         return (
-            str(
+            to_xml(
                 base_layout(
                     "Error",
                     Article(
@@ -142,4 +143,5 @@ async def public_viewer(token: str):
                 )
             ),
             500,
+            {"Content-Type": "text/html"},
         )

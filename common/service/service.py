@@ -127,7 +127,7 @@ class EntityServiceImpl(EntityService):
         """
         # Extract technical_id from data if not provided
         if entity_id is None and isinstance(data, dict):
-            entity_id = data.get("technical_id") or data.get("id")
+            entity_id = data.get("technical_id") or data.get("entity_id") or data.get("id")
 
         # Extract state from data if not provided
         if state is None and isinstance(data, dict):
