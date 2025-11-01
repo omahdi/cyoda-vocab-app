@@ -6,6 +6,7 @@ from quart import Quart, Response
 from quart_schema import QuartSchema, ResponseSchemaValidationError, hide
 
 from application.routes.share_links import share_links_bp
+from application.routes.shared_vocabulary import shared_vocabulary_bp
 
 # Import blueprints for different route groups
 from application.routes.vocabulary_items import vocabulary_items_bp
@@ -34,6 +35,7 @@ QuartSchema(
             "description": "VocabularyItem management endpoints",
         },
         {"name": "share-links", "description": "ShareLink management endpoints"},
+        {"name": "shared", "description": "Public shared vocabulary access"},
         {"name": "System", "description": "System and health endpoints"},
     ],
     security=[{"bearerAuth": []}],
@@ -48,6 +50,7 @@ QuartSchema(
 # Register blueprints
 app.register_blueprint(vocabulary_items_bp)
 app.register_blueprint(share_links_bp)
+app.register_blueprint(shared_vocabulary_bp)
 
 # Global holder for the background task to satisfy mypy
 # (avoid setting arbitrary attrs on app)
