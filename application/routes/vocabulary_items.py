@@ -23,7 +23,7 @@ vocabulary_items_bp = Blueprint(
 @vocabulary_items_bp.route("", methods=["POST"])
 @tag(["vocabulary-items"])
 @operation_id("create_vocabulary_item")
-@validate(responses={201: (Dict[str, Any], None), 400: (Dict[str, str], None)})
+@validate(request=VocabularyItem, responses={201: (Dict[str, Any], None), 400: (Dict[str, str], None)})
 async def create_vocabulary_item(data: VocabularyItem) -> ResponseReturnValue:
     try:
         service = get_entity_service()
@@ -86,7 +86,7 @@ async def list_vocabulary_items() -> ResponseReturnValue:
 @vocabulary_items_bp.route("/<entity_id>", methods=["PUT"])
 @tag(["vocabulary-items"])
 @operation_id("update_vocabulary_item")
-@validate(responses={200: (Dict[str, Any], None), 404: (Dict[str, str], None)})
+@validate(request=VocabularyItem, responses={200: (Dict[str, Any], None), 404: (Dict[str, str], None)})
 async def update_vocabulary_item(
     entity_id: str, data: VocabularyItem
 ) -> ResponseReturnValue:

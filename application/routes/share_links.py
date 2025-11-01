@@ -22,7 +22,7 @@ share_links_bp = Blueprint("share_links", __name__, url_prefix="/api/share-links
 @share_links_bp.route("", methods=["POST"])
 @tag(["share-links"])
 @operation_id("create_share_link")
-@validate(responses={201: (Dict[str, Any], None), 400: (Dict[str, str], None)})
+@validate(request=ShareLink, responses={201: (Dict[str, Any], None), 400: (Dict[str, str], None)})
 async def create_share_link(data: ShareLink) -> ResponseReturnValue:
     try:
         service = get_entity_service()
