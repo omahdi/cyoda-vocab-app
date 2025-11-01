@@ -47,11 +47,21 @@ async def get_shared_vocabulary(token: str) -> ResponseReturnValue:
 
         share_link = None
         share_link_id = None
+        logger.info(f"Searching for token '{token}' in {len(share_links)} ShareLinks")
         for link in share_links:
-            link_data = _to_entity_dict(link.data)
+            # link.data is a dict with structure: {'type': 'ENTITY', 'data': {...}, 'meta': {...}}
+            # We need to access the nested 'data' field
+            link_wrapper = link.data
+            if isinstance(link_wrapper, dict) and 'data' in link_wrapper:
+                link_data = link_wrapper['data']
+            else:
+                link_data = _to_entity_dict(link.data)
+            
+            logger.info(f"Checking ShareLink with token: {link_data.get('token')}")
             if link_data.get("token") == token:
                 share_link = link_data
                 share_link_id = link.metadata.id
+                logger.info(f"Found matching ShareLink: {share_link_id}")
                 break
 
         if not share_link:
@@ -72,7 +82,14 @@ async def get_shared_vocabulary(token: str) -> ResponseReturnValue:
         )
 
         # Extract just the vocabulary data
-        vocabulary_items = [_to_entity_dict(item.data) for item in all_items]
+        # Same structure as ShareLink - need to access nested 'data' field
+        vocabulary_items = []
+        for item in all_items:
+            item_wrapper = item.data
+            if isinstance(item_wrapper, dict) and 'data' in item_wrapper:
+                vocabulary_items.append(item_wrapper['data'])
+            else:
+                vocabulary_items.append(_to_entity_dict(item.data))
 
         # TODO: Update access tracking (visitCount, lastAccessedAt)
         # This would require updating the ShareLink entity
