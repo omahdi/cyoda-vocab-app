@@ -1,0 +1,202 @@
+# CSV Vocabulary Import Guide
+
+## Overview
+
+The `import_vocabulary_csv.py` script allows you to bulk import vocabulary items from CSV files into your Cyoda vocabulary application via the REST API.
+
+## Prerequisites
+
+1. **Application must be running** on port 8000:
+   ```bash
+   python -m application.app
+   ```
+
+2. **CSV file** with vocabulary data in the correct format
+
+## CSV Format
+
+The CSV should have the following columns:
+
+```csv
+id,front,back,comment
+,hello,hola,Basic greeting
+,goodbye,adiós,Farewell phrase
+```
+
+### Column Definitions
+
+- **id**: (Optional) Entity ID - usually empty for new imports
+- **front**: (Required) Front side of flashcard (e.g., English/Finnish word)
+- **back**: (Required) Back side of flashcard (e.g., translation)
+- **comment**: (Optional) Additional notes, grammar hints, examples
+
+## Usage
+
+### Basic Import
+
+```bash
+python import_vocabulary_csv.py finnish-vocab-example.csv
+```
+
+### Import with Lesson Name
+
+```bash
+python import_vocabulary_csv.py finnish-vocab-example.csv --lesson "Finnish Basics - Family & Self"
+```
+
+### Dry Run (Preview)
+
+Preview what would be imported without actually creating entities:
+
+```bash
+python import_vocabulary_csv.py finnish-vocab-example.csv --dry-run
+```
+
+### Custom API URL
+
+If your app runs on a different port:
+
+```bash
+python import_vocabulary_csv.py vocab.csv --url http://localhost:5000
+```
+
+### All Options
+
+```bash
+python import_vocabulary_csv.py <csv_file> \
+  [--url BASE_URL] \
+  [--lesson LESSON_NAME] \
+  [--dry-run]
+```
+
+## Example Import Session
+
+```bash
+# 1. Start the application (in another terminal)
+python -m application.app
+
+# 2. Preview the import
+python import_vocabulary_csv.py finnish-vocab-example.csv --dry-run
+
+# 3. Import with lesson name
+python import_vocabulary_csv.py finnish-vocab-example.csv \
+  --lesson "Finnish Basics - Family & Self"
+
+# 4. Verify import via API
+curl http://127.0.0.1:8000/api/vocabulary-items | jq '.total'
+```
+
+## Sample CSV: finnish-vocab-example.csv
+
+Successfully parsed **12 vocabulary items**:
+
+1. **olen** → olla  
+   *Comment: (ich) bin [olla] 1. Pers. Sg. von olla (sein)*
+
+2. **naimisissa** → verheiratet  
+   *Comment: Inessiv Plural (feste Form)*
+
+3. **G + kanssa** → mit (jemandem)  
+   *Comment: Phrase, G = Genitiv (z.B. Veijon kanssa)*
+
+4. **rakastan** → (ich) liebe  
+   *Comment: [rakastaa + P] 1. Pers. Sg., Tyyppi 1, + Partitiv (P)*
+
+5. **häntä** → ihn / sie  
+   *Comment: [hän] Partitiv von hän*
+
+6. **meillä on** → wir haben  
+   *Comment: Phrase (Adessiv + on)*
+
+7. **lapsi** → Kind  
+   *Comment: [lapsi, lapsen]*
+
+8. **hän** → er / sie
+
+9. **söpö** → süß
+
+10. **-vuotias** → Jahre alt  
+    *Comment: Suffix (z.B. 4-vuotias)*
+
+11. **tyttö** → Mädchen
+
+12. **hänen** → sein / ihr (Besitz)  
+    *Comment: [hän] Genitiv von hän*
+
+## Features
+
+✅ **Robust CSV parsing** - Handles quoted fields with commas  
+✅ **Validation** - Checks required fields (front & back)  
+✅ **Dry run mode** - Preview before importing  
+✅ **Progress tracking** - Shows import status for each item  
+✅ **Error handling** - Reports failures with details  
+✅ **Lesson assignment** - Optionally assign all items to a lesson  
+✅ **Summary report** - Total, successful, and failed imports
+
+## Error Handling
+
+The script will:
+- Skip rows with missing required fields (front or back)
+- Continue importing even if some items fail
+- Provide detailed error messages for failed items
+- Return exit code 0 on success, 1 on any failures
+
+## Troubleshooting
+
+### Connection Refused Error
+
+```
+❌ Failed: Connection refused
+```
+
+**Solution**: Make sure the application is running:
+```bash
+python -m application.app
+```
+
+### Row Skipped Warning
+
+```
+⚠️  Row 5: Skipping - missing front or back
+```
+
+**Solution**: Check that the CSV row has both front and back values.
+
+### Invalid CSV Format
+
+**Solution**: Ensure CSV has proper headers and quoted fields:
+```csv
+id,front,back,comment
+,"word","translation","notes"
+```
+
+## Verification
+
+After import, verify the data:
+
+```bash
+# Count total items
+curl -s http://127.0.0.1:8000/api/vocabulary-items | jq '.total'
+
+# List all items
+curl -s http://127.0.0.1:8000/api/vocabulary-items | jq '.entities[].data | {front, back, lesson}'
+
+# Search by lesson
+curl -s http://127.0.0.1:8000/api/vocabulary-items | \
+  jq '.entities[].data | select(.lesson == "Finnish Basics - Family & Self")'
+```
+
+## Next Steps
+
+1. **Start the application**
+2. **Run the import script** with your CSV file
+3. **Verify** the imported data via API or application UI
+4. **Create ShareLinks** to share vocabulary sets
+5. **Use workflows** for automated processing
+
+## Notes
+
+- One CSV row skipped (row 5) due to missing back field
+- The script uses the REST API, so all validation and workflow rules apply
+- Imported items will go through the VocabularyItem workflow
+- Entity IDs are auto-generated by Cyoda
